@@ -1,0 +1,239 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: info@gemini-commerce.com
+    name: Gemini Team
+  license:
+    name: Gemini fair use license
+    url: https://gemini-commerce.com/api/fair-use-license
+  title: Token Tracker Service
+  version: 1.0.0
+servers:
+- url: https://token-tracker.api.gogemini.io/
+security:
+- Authorization: []
+tags:
+- name: TokenTracker
+paths:
+  /v1/stripe/webhook:
+    post:
+      description: Stripe webhook
+      operationId: TokenTracker_StripeWebhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tokentrackerStripeWebhookRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokentrackerStripeWebhookResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rpcStatus'
+          description: An unexpected error response.
+      security:
+      - standardAuthorization: []
+      summary: StripeWebhook
+      tags:
+      - TokenTracker
+      x-codegen-request-body-name: body
+      x-content-type: application/json
+      x-accepts: application/json
+  /v1/{tenantId}/adjust_token_balance:
+    post:
+      description: Adjust token balance
+      operationId: TokenTracker_AdjustTokenBalance
+      parameters:
+      - in: path
+        name: tenantId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenTracker_AdjustTokenBalance_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokentrackerAdjustTokenBalanceResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rpcStatus'
+          description: An unexpected error response.
+      security:
+      - standardAuthorization: []
+      summary: AdjustTokenBalance
+      tags:
+      - TokenTracker
+      x-codegen-request-body-name: body
+      x-content-type: application/json
+      x-accepts: application/json
+  /v1/{tenantId}/get_token_balance:
+    post:
+      description: Get token balance
+      operationId: TokenTracker_GetTokenBalance
+      parameters:
+      - in: path
+        name: tenantId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokentrackerGetTokenBalanceResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rpcStatus'
+          description: An unexpected error response.
+      security:
+      - standardAuthorization: []
+      summary: GetTokenBalance
+      tags:
+      - TokenTracker
+      x-codegen-request-body-name: body
+      x-content-type: application/json
+      x-accepts: application/json
+components:
+  schemas:
+    StripeEventData:
+      properties:
+        object:
+          properties: {}
+          type: object
+        previousAttributes:
+          properties: {}
+          type: object
+        raw:
+          type: string
+      type: object
+    StripeEventRequest:
+      properties:
+        id:
+          type: string
+        idempotencyKey:
+          type: string
+      type: object
+    protobufAny:
+      additionalProperties:
+        type: object
+      properties:
+        '@type':
+          type: string
+      type: object
+    protobufNullValue:
+      default: NULL_VALUE
+      description: |-
+        `NullValue` is a singleton enumeration to represent the null value for the
+        `Value` type union.
+
+         The JSON representation for `NullValue` is JSON `null`.
+
+         - NULL_VALUE: Null value.
+      enum:
+      - NULL_VALUE
+      type: string
+    rpcStatus:
+      properties:
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+        details:
+          items:
+            $ref: '#/components/schemas/protobufAny'
+          type: array
+      type: object
+    tokentrackerAdjustTokenBalanceResponse:
+      example:
+        newBalance: newBalance
+      properties:
+        newBalance:
+          format: int64
+          type: string
+      type: object
+    tokentrackerGetTokenBalanceResponse:
+      example:
+        balance: balance
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        balance:
+          format: uint64
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      type: object
+    tokentrackerStripeWebhookRequest:
+      properties:
+        data:
+          $ref: '#/components/schemas/StripeEventData'
+        account:
+          type: string
+        apiVersion:
+          type: string
+        created:
+          format: int64
+          type: string
+        id:
+          type: string
+        livemode:
+          type: boolean
+        object:
+          type: string
+        pendingWebhooks:
+          format: int64
+          type: string
+        request:
+          $ref: '#/components/schemas/StripeEventRequest'
+        type:
+          type: string
+      type: object
+    tokentrackerStripeWebhookResponse:
+      type: object
+    TokenTracker_AdjustTokenBalance_request:
+      properties:
+        amount:
+          format: int64
+          title: amount to adjust the balance by (positive or negative)
+          type: string
+      type: object
+  securitySchemes:
+    Authorization:
+      in: header
+      name: Authorization
+      type: apiKey
+    standardAuthorization:
+      flows:
+        implicit:
+          scopes: {}
+      type: oauth2
+x-original-swagger-version: "2.0"
+
